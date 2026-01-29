@@ -244,11 +244,9 @@ def get_weekly_goal():
                 "target_calories": row[1]
             }), 200
         else:
-            # Default values if no goal set yet
-            return jsonify({
-                "target_km": 10.0,
-                "target_calories": 2000
-            }), 200
+            # --- CHANGED HERE ---
+            # Return 404 so the Android App knows this user is new/has no goals!
+            return jsonify({"error": "No goals found"}), 404 
 
     except Exception as e:
         print(f"❌ DATABASE ERROR: {e}")
