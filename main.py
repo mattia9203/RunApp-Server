@@ -251,6 +251,33 @@ def get_weekly_goal():
     except Exception as e:
         print(f"❌ DATABASE ERROR: {e}")
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/get_user', methods=['GET'])
+def get_user():
+    uid = request.args.get('uid')
+    if not uid:
+        return jsonify({"error": "Missing UID"}), 400
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT name, weight, height FROM users WHERE user_id = %s", (uid,))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+
+        if row:
+            return jsonify({
+                "name": row[0],
+                "weight": float(row[1]) if row[1] else 70.0,
+                "height": float(row[2]) if row[2] else 175.0
+            }), 200
+        else:
+            return jsonify({"error": "User not found"}), 404
+            
+    except Exception as e:
+        print(f"❌ DATABASE ERROR: {e}")
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
